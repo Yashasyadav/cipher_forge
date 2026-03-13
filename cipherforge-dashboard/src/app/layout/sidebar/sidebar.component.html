@@ -1,0 +1,25 @@
+<div class="sidebar-wrap">
+  <div class="brand-block">
+    <span class="mark">CF</span>
+    <div>
+      <h2>CipherForge</h2>
+      <p>Enterprise Wipe Hub</p>
+    </div>
+  </div>
+
+  <mat-nav-list>
+    @for (item of navigation; track item.route) {
+      <a
+        mat-list-item
+        [routerLink]="item.route"
+        routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="onNavigate()"
+      >
+        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+        <span matListItemTitle>{{ item.label }}</span>
+      </a>
+    }
+  </mat-nav-list>
+</div>
+

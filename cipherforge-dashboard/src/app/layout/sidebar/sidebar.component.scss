@@ -1,0 +1,66 @@
+.sidebar-wrap {
+  height: 100%;
+  padding: 0.95rem 0.85rem;
+  border-right: 1px solid rgba(120, 172, 255, 0.2);
+  background: linear-gradient(180deg, #081a35 0%, #0d2f64 46%, #124289 100%);
+}
+
+.brand-block {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.6rem 0.45rem 1rem;
+  margin-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(187, 208, 255, 0.24);
+
+  .mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.55rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0d2446;
+    background: linear-gradient(145deg, #93d7ff, #68a9ff);
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    letter-spacing: 0.015em;
+    color: #f4f8ff;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.73rem;
+    color: #b8d1f9;
+  }
+}
+
+a[mat-list-item] {
+  margin-bottom: 0.34rem;
+  border-radius: 10px;
+  color: #dbe8ff;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+a[mat-list-item] .mdc-list-item__primary-text,
+a[mat-list-item] .mat-icon {
+  color: inherit;
+}
+
+a[mat-list-item]:hover {
+  background: rgba(113, 165, 255, 0.2);
+  transform: translateX(2px);
+}
+
+a[mat-list-item].active-link {
+  color: #f8fbff;
+  background: linear-gradient(90deg, rgba(137, 187, 255, 0.34) 0%, rgba(71, 135, 255, 0.33) 100%);
+  box-shadow: inset 0 0 0 1px rgba(202, 224, 255, 0.4);
+}
+

@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: cipherforge-backend
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/cipherforge}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres123}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: ${SERVER_PORT:8081}
+
+logging:
+  level:
+    root: INFO
+    com.cipherforge: INFO
+
+cipherforge:
+  python-engine:
+    base-url: ${PYTHON_ENGINE_BASE_URL:http://localhost:8000}
+    timeout-seconds: ${PYTHON_ENGINE_TIMEOUT:20}
+  seed-sample-data: ${SEED_SAMPLE_DATA:false}
+  wipe-sync:
+    fixed-delay-ms: ${WIPE_SYNC_FIXED_DELAY_MS:5000}
+  security:
+    jwt-secret: ${JWT_SECRET:change-this-secret-key-change-this-secret-key}
+    token-validity-minutes: ${JWT_VALIDITY_MINUTES:120}

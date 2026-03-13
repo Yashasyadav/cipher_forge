@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:cipherforge_test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+
+server:
+  port: 0
+
+cipherforge:
+  security:
+    jwt-secret: test-jwt-secret-key-test-jwt-secret-key-123456
+    token-validity-minutes: 120
+  seed-sample-data: false
+  wipe-sync:
+    fixed-delay-ms: 60000
+
+spring.task.scheduling.enabled: false

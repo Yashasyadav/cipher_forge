@@ -1,0 +1,82 @@
+/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$blue-palette,
+        tertiary: mat.$cyan-palette
+      ),
+      typography: 'IBM Plex Sans',
+      density: 0
+    )
+  );
+}
+
+:root {
+  --cf-bg: #eef4ff;
+  --cf-surface: #ffffff;
+  --cf-border: #dbe6ff;
+  --cf-text: #10243f;
+  --cf-muted: #50698a;
+  --cf-primary: #1e4ed8;
+  --cf-primary-dark: #1e3a8a;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  color: var(--cf-text);
+  background: linear-gradient(135deg, #eff5ff 0%, #f6f9ff 55%, #eef3ff 100%);
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
+}
+
+.page-shell {
+  display: grid;
+  gap: 1rem;
+}
+
+.page-shell h1 {
+  margin: 0;
+  font-size: 1.55rem;
+  letter-spacing: 0.01em;
+  color: #10294d;
+}
+
+.mat-mdc-card {
+  background: var(--cf-surface);
+  border: 1px solid var(--cf-border);
+  box-shadow: 0 8px 24px rgba(15, 35, 76, 0.07);
+  border-radius: 14px;
+}
+
+.mat-mdc-header-row {
+  background: #f3f7ff;
+}
+
+.mat-mdc-header-cell {
+  color: #274365;
+  font-weight: 600;
+}
+
+.mat-mdc-row:hover .mat-mdc-cell {
+  background: #f8faff;
+}

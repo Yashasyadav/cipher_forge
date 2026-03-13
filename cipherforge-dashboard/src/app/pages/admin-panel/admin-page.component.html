@@ -1,0 +1,53 @@
+<section class="page-shell">
+  <div class="headline">
+    <h1>Admin Statistics</h1>
+    <button mat-stroked-button (click)="refresh()">Refresh</button>
+  </div>
+
+  @if (isLoading) {
+    <div class="state-text">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+  } @else if (stats) {
+    <div class="stats-grid analytics-grid">
+      <mat-card class="analytics-card">
+        <p>Total Devices Wiped</p>
+        <h2>{{ devicesWiped }}</h2>
+      </mat-card>
+      <mat-card class="analytics-card">
+        <p>Successful Wipes</p>
+        <h2>{{ successfulWipes }}</h2>
+      </mat-card>
+      <mat-card class="analytics-card">
+        <p>Failed Wipes</p>
+        <h2>{{ failedWipes }}</h2>
+      </mat-card>
+      <mat-card class="analytics-card">
+        <p>Active Jobs</p>
+        <h2>{{ activeJobs }}</h2>
+      </mat-card>
+      <mat-card class="analytics-card">
+        <p>Certificates Issued</p>
+        <h2>{{ certificatesIssued }}</h2>
+      </mat-card>
+    </div>
+
+    <div class="chart-grid">
+      <mat-card class="chart-card">
+        <h3>Wipe Volume</h3>
+        <div class="canvas-shell">
+          <canvas #volumeChartCanvas></canvas>
+        </div>
+      </mat-card>
+
+      <mat-card class="chart-card">
+        <h3>Wipe Outcome</h3>
+        <div class="canvas-shell">
+          <canvas #outcomeChartCanvas></canvas>
+        </div>
+      </mat-card>
+    </div>
+  } @else {
+    <p class="state-text">{{ errorMessage || 'Unable to load statistics.' }}</p>
+  }
+</section>

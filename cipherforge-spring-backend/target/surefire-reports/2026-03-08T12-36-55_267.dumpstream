@@ -1,0 +1,5 @@
+# Created at 2026-03-08T12:36:56.906
+Boot Manifest-JAR contains absolute paths in classpath 'd:\SIH_2025-main\cipherforge-spring-backend\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+

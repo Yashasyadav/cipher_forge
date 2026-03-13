@@ -1,0 +1,74 @@
+<section class="page-shell">
+  <div class="headline">
+    <h1>System Device Dashboard</h1>
+    <button mat-flat-button color="primary" (click)="loadDevices()">Refresh Devices</button>
+  </div>
+
+  <div class="kpi-grid">
+    <mat-card class="kpi-card">
+      <mat-icon>storage</mat-icon>
+      <div>
+        <p>Total Connected</p>
+        <h2>{{ deviceCount }}</h2>
+      </div>
+    </mat-card>
+    <mat-card class="kpi-card">
+      <mat-icon>memory</mat-icon>
+      <div>
+        <p>SSD / NVMe</p>
+        <h2>{{ ssdCount }}</h2>
+      </div>
+    </mat-card>
+    <mat-card class="kpi-card">
+      <mat-icon>dns</mat-icon>
+      <div>
+        <p>HDD</p>
+        <h2>{{ hddCount }}</h2>
+      </div>
+    </mat-card>
+  </div>
+
+  <mat-card class="table-card">
+    <div class="table-head">
+      <h3>Connected Devices</h3>
+      @if (loading) {
+        <mat-spinner diameter="26"></mat-spinner>
+      }
+    </div>
+
+    @if (errorMessage) {
+      <p class="state-text">{{ errorMessage }}</p>
+    }
+
+    <table mat-table [dataSource]="devices" class="device-table">
+      <ng-container matColumnDef="deviceName">
+        <th mat-header-cell *matHeaderCellDef>Device</th>
+        <td mat-cell *matCellDef="let row">{{ row.deviceName }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="deviceType">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let row">{{ row.deviceType }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="size">
+        <th mat-header-cell *matHeaderCellDef>Size</th>
+        <td mat-cell *matCellDef="let row">{{ row.size }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="serialNumber">
+        <th mat-header-cell *matHeaderCellDef>Serial</th>
+        <td mat-cell *matCellDef="let row">{{ row.serialNumber }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="lastSeenAt">
+        <th mat-header-cell *matHeaderCellDef>Last Seen</th>
+        <td mat-cell *matCellDef="let row">{{ row.lastSeenAt | date: 'medium' }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </mat-card>
+</section>
+

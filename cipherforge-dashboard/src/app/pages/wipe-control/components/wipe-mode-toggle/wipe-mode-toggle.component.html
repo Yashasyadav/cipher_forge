@@ -1,0 +1,13 @@
+<div class="toggle-shell">
+  <p class="toggle-label">Wipe Mode</p>
+  <mat-button-toggle-group
+    class="mode-switch"
+    [value]="mode"
+    [disabled]="disabled"
+    (change)="onModeChanged($event)"
+    aria-label="Wipe mode selector"
+  >
+    <mat-button-toggle value="DEVICE_WIPE">Device Wipe</mat-button-toggle>
+    <mat-button-toggle value="FILE_SHREDDER">File Shredder</mat-button-toggle>
+  </mat-button-toggle-group>
+</div>

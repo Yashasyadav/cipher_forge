@@ -1,0 +1,36 @@
+.login-shell {
+  min-height: calc(100vh - 180px);
+  display: grid;
+  place-items: center;
+}
+
+.login-card {
+  width: min(420px, 100%);
+  padding: 1.2rem;
+  border-top: 4px solid #1d4ed8;
+
+  h1 {
+    margin: 0;
+    color: #0f172a;
+  }
+
+  p {
+    margin: 0.35rem 0 1rem;
+    color: #475569;
+  }
+}
+
+form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.error {
+  margin: 0;
+  color: #dc2626;
+  font-size: 0.9rem;
+}
+
+button {
+  justify-self: end;
+}

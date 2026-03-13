@@ -1,0 +1,26 @@
+.layout-shell {
+  height: 100vh;
+  background: linear-gradient(145deg, #ebf2ff 0%, #f4f8ff 45%, #eef3ff 100%);
+}
+
+.nav-panel {
+  width: 280px;
+  box-shadow: none;
+}
+
+.content-wrap {
+  min-height: calc(100vh - 116px);
+  padding: 1.4rem 1.6rem 2rem;
+  max-width: 1400px;
+}
+
+@media (max-width: 920px) {
+  .nav-panel {
+    width: 250px;
+  }
+
+  .content-wrap {
+    padding: 1rem;
+  }
+}
+

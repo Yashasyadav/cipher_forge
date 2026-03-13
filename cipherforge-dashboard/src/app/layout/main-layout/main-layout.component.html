@@ -1,0 +1,19 @@
+<mat-sidenav-container class="layout-shell">
+  <mat-sidenav
+    class="nav-panel"
+    [mode]="isMobile ? 'over' : 'side'"
+    [opened]="isMobile ? mobileNavOpen : true"
+    (closedStart)="mobileNavOpen = false"
+  >
+    <app-sidebar (navigate)="onSidebarNavigate()" />
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <app-header (menuToggle)="onMenuToggle()" />
+    <main class="content-wrap">
+      <router-outlet />
+    </main>
+    <app-footer />
+  </mat-sidenav-content>
+</mat-sidenav-container>
+

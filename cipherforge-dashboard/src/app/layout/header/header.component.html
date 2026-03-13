@@ -1,0 +1,15 @@
+<header class="topbar">
+  <button mat-icon-button class="menu-toggle" (click)="onToggleMenu()" aria-label="Toggle menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <h1 class="topbar-title">CipherForge Enterprise Dashboard</h1>
+  <span class="spacer"></span>
+
+  <div class="identity">
+    <span class="role-badge">{{ role }}</span>
+    <span class="username">{{ username }}</span>
+    <button mat-stroked-button class="logout-btn" (click)="logout()">Logout</button>
+  </div>
+</header>
+

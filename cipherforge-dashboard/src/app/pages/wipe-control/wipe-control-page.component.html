@@ -1,0 +1,324 @@
+<section class="page-shell wipe-control-shell">
+  <header class="control-header">
+    <h1>Wipe Control Center</h1>
+    <p>Select wipe mode, target, and algorithm. Execute secure operations with live runtime visibility.</p>
+  </header>
+
+  <div class="loading-strip" [class.loading-strip--active]="loadingDevices || loadingMethods || loadingDrives || loadingFolder || starting">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+
+  @if (devicesError || methodsError || drivesError || folderError) {
+    <div class="error-stack">
+      @if (devicesError) {
+        <p class="job-info"><mat-icon>error_outline</mat-icon><span>{{ devicesError }}</span></p>
+      }
+      @if (methodsError) {
+        <p class="job-info"><mat-icon>error_outline</mat-icon><span>{{ methodsError }}</span></p>
+      }
+      @if (drivesError) {
+        <p class="job-info"><mat-icon>error_outline</mat-icon><span>{{ drivesError }}</span></p>
+      }
+      @if (folderError) {
+        <p class="job-info"><mat-icon>error_outline</mat-icon><span>{{ folderError }}</span></p>
+      }
+    </div>
+  }
+
+  <mat-card class="control-card">
+    <form [formGroup]="form" class="wipe-form" novalidate (submit)="preventNativeSubmit($event)">
+      <app-wipe-mode-toggle
+        class="mode-toggle"
+        [mode]="selectedMode"
+        [disabled]="hasOngoingOperation"
+        (modeChange)="onWipeModeChanged($event)"
+      ></app-wipe-mode-toggle>
+
+      @if (isDeviceMode) {
+        <section class="mode-block">
+          <div class="mode-block-head">
+            <h2>Device Wipe Workflow</h2>
+            <p>Run full-device sanitization. Choose one target and one certified wipe algorithm.</p>
+          </div>
+
+          <div class="device-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Select Device</mat-label>
+              <mat-select formControlName="device">
+                @for (d of devices; track d.id) {
+                  <mat-option [value]="d.deviceName">
+                    {{ d.deviceName }} - {{ d.deviceType }} ({{ d.size }})
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Select Algorithm</mat-label>
+              <mat-select formControlName="method" [disabled]="wipeMethods.length === 0 || loadingMethods">
+                @for (algo of wipeMethods; track algo) {
+                  <mat-option [value]="algo">{{ algo }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <article class="action-panel">
+              <button
+                mat-flat-button
+                color="primary"
+                type="button"
+                (click)="startDeviceWipe()"
+                [disabled]="starting || loadingMethods"
+              >
+                Start Device Wipe
+              </button>
+              <p>Operation will be tracked in the live execution console below.</p>
+            </article>
+          </div>
+        </section>
+      }
+
+      @if (isFileShredMode) {
+        <section class="mode-block file-shred-grid">
+          <div class="mode-block-head">
+            <h2>File Shred Workflow</h2>
+            <p>Target specific folders/files with controlled secure deletion and per-item progress tracking.</p>
+          </div>
+
+          <div class="security-warning" role="alert" aria-live="polite">
+            <mat-icon color="warn">warning</mat-icon>
+            <p>
+              File wipe may not fully destroy hidden copies on SSD drives due to wear leveling.
+              Use full disk wipe for guaranteed destruction.
+            </p>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Select Drive</mat-label>
+            <mat-select
+              formControlName="drive"
+              (valueChange)="onDriveChanged($event)"
+              [disabled]="loadingDrives || drives.length === 0"
+            >
+              @for (drive of drives; track drive.drive) {
+                <mat-option [value]="drive.drive">
+                  {{ getDriveDisplayLabel(drive) }} ({{ drive.drive }}) - {{ drive.size }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Select Algorithm</mat-label>
+            <mat-select formControlName="shredMethod" [disabled]="wipeMethods.length === 0 || loadingMethods">
+              @for (algo of wipeMethods; track algo) {
+                <mat-option [value]="algo">{{ algo }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <div class="selection-summary">
+            <article class="summary-card">
+              <span>Selected folders</span>
+              <strong>{{ selectedFoldersCount }}</strong>
+            </article>
+            <article class="summary-card">
+              <span>Selected files</span>
+              <strong>{{ selectedFilesCount }}</strong>
+            </article>
+            <article class="summary-card">
+              <span>Total targets</span>
+              <strong>{{ totalSelectedCount }}</strong>
+            </article>
+          </div>
+
+          <section class="explorer-layout">
+            <article class="explorer-panel tree-panel">
+              <h3>Folder Navigation Tree</h3>
+
+              <mat-tree [dataSource]="folderTreeDataSource" [treeControl]="treeControl" class="folder-tree">
+                <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+                  <button mat-icon-button disabled aria-hidden="true"></button>
+
+                  <mat-checkbox
+                    [checked]="isFolderSelected(node.path)"
+                    (change)="onFolderSelection(node, $event.checked)"
+                    (click)="$event.stopPropagation()"
+                  ></mat-checkbox>
+
+                  <button mat-button type="button" class="node-label" (click)="selectFolder(node)">
+                    <mat-icon>folder</mat-icon>
+                    <span>{{ node.name }}</span>
+                  </button>
+                </mat-tree-node>
+
+                <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+                  <div class="tree-node-row" matTreeNodePadding>
+                    <button mat-icon-button matTreeNodeToggle type="button" (click)="toggleFolder(node, $event)">
+                      <mat-icon>{{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
+                    </button>
+
+                    <mat-checkbox
+                      [checked]="isFolderSelected(node.path)"
+                      (change)="onFolderSelection(node, $event.checked)"
+                      (click)="$event.stopPropagation()"
+                    ></mat-checkbox>
+
+                    <button mat-button type="button" class="node-label" (click)="selectFolder(node)">
+                      <mat-icon>folder</mat-icon>
+                      <span>{{ node.name }}</span>
+                    </button>
+                  </div>
+
+                  <div class="tree-children" [class.tree-children--hidden]="!treeControl.isExpanded(node)">
+                    <ng-container matTreeNodeOutlet></ng-container>
+                  </div>
+                </mat-nested-tree-node>
+              </mat-tree>
+
+              <div class="folder-shortcuts">
+                <h4>Folders In Current Location</h4>
+                @if (selectedFolderNode && selectedFolderNode.children.length > 0) {
+                  <div class="folder-shortcut-list">
+                    @for (child of selectedFolderNode.children; track child.path) {
+                      <div class="folder-shortcut-row">
+                        <mat-checkbox
+                          [checked]="isFolderSelected(child.path)"
+                          (change)="onFolderSelection(child, $event.checked)"
+                        ></mat-checkbox>
+
+                        <button mat-stroked-button type="button" class="folder-shortcut" (click)="selectFolder(child)">
+                          <mat-icon>folder</mat-icon>
+                          <span>{{ child.name }}</span>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <p class="empty-state">No subfolders found in this location.</p>
+                }
+              </div>
+            </article>
+
+            <article class="explorer-panel files-panel">
+              <h3>Files</h3>
+
+              @if (!selectedFolderNode) {
+                <p class="empty-state">Select a drive and folder to list files.</p>
+              }
+
+              @if (selectedFolderNode && currentFiles.length === 0) {
+                <p class="empty-state">No files in this folder.</p>
+              }
+
+              @if (selectedFolderNode && currentFiles.length > 0) {
+                <div class="file-list">
+                  @for (file of currentFiles; track file.path) {
+                    <label class="file-row">
+                      <mat-checkbox
+                        [checked]="isFileSelected(file.path)"
+                        (change)="onFileSelection(file.path, $event.checked)"
+                      ></mat-checkbox>
+                      <mat-icon>description</mat-icon>
+                      <span class="file-name">{{ file.name }}</span>
+                      <span class="file-size">{{ file.size }}</span>
+                    </label>
+                  }
+                </div>
+              }
+            </article>
+          </section>
+
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            class="danger-action"
+            (click)="secureDelete()"
+            [disabled]="starting || loadingMethods || totalSelectedCount === 0"
+          >
+            Secure Delete
+          </button>
+        </section>
+      }
+    </form>
+
+    @if (showRuntimePanel) {
+      <section class="runtime-panel">
+        <div class="runtime-header">
+          <h3>Live Execution Console</h3>
+          <button mat-stroked-button type="button" (click)="clearExecutionLogs()">Clear Logs</button>
+        </div>
+
+        @if (activeDeviceJob) {
+          <article class="runtime-status-card">
+            <div class="runtime-status-header">
+              <strong>Device Job</strong>
+              <span class="status-chip">{{ activeDeviceJob.status }}</span>
+            </div>
+            <p class="job-info">
+              Job: <strong>{{ activeDeviceJob.jobId }}</strong> |
+              Device: <strong>{{ activeDeviceJob.device }}</strong> |
+              Method: <strong>{{ activeDeviceJob.wipeMethod }}</strong> |
+              Live WS: <strong>{{ deviceLiveConnected ? 'Connected' : 'Disconnected' }}</strong>
+            </p>
+            <mat-progress-bar mode="determinate" [value]="activeDeviceJob.progress"></mat-progress-bar>
+          </article>
+        }
+
+        @if (currentFolderJob) {
+          <article class="runtime-status-card">
+            <div class="runtime-status-header">
+              <strong>Folder Job</strong>
+              <span class="status-chip">{{ currentFolderJob.status }}</span>
+            </div>
+            <p class="job-info">
+              Job: <strong>{{ currentFolderJob.job_id }}</strong> |
+              Path: <strong>{{ currentFolderJob.path }}</strong> |
+              Method: <strong>{{ currentFolderJob.method }}</strong>
+            </p>
+            <p class="job-info">
+              Files: <strong>{{ currentFolderJob.processed_files }}/{{ currentFolderJob.total_files }}</strong> |
+              Deleted: <strong>{{ currentFolderJob.deleted_files }}</strong> |
+              Failed: <strong>{{ currentFolderJob.failed_files }}</strong>
+            </p>
+            @if (currentFolderJob.current_file) {
+              <p class="job-info">Current file: <strong>{{ currentFolderJob.current_file }}</strong></p>
+            }
+            <mat-progress-bar mode="determinate" [value]="currentFolderJob.progress"></mat-progress-bar>
+          </article>
+        }
+
+        @if (fileDeleteTotal > 0) {
+          <article class="runtime-status-card">
+            <div class="runtime-status-header">
+              <strong>File Shred Session</strong>
+              <span class="status-chip">{{ fileDeleteRunning ? 'RUNNING' : 'FINISHED' }}</span>
+            </div>
+            <p class="job-info">
+              Progress: <strong>{{ fileDeleteCompleted }}/{{ fileDeleteTotal }}</strong> |
+              Success: <strong>{{ fileDeleteSuccess }}</strong> |
+              Failed: <strong>{{ fileDeleteFailed }}</strong>
+            </p>
+            @if (currentDeleteTarget) {
+              <p class="job-info">Current target: <strong>{{ currentDeleteTarget }}</strong></p>
+            }
+            <mat-progress-bar mode="determinate" [value]="fileDeleteProgress"></mat-progress-bar>
+          </article>
+        }
+
+        <article class="terminal-card">
+          <p class="terminal-title">Runtime Log</p>
+          <div class="terminal-body">
+            @if (executionLogs.length === 0) {
+              <p class="terminal-empty">No runtime logs yet.</p>
+            }
+            @for (line of executionLogs; track $index) {
+              <div class="terminal-line">{{ line }}</div>
+            }
+          </div>
+        </article>
+      </section>
+    }
+  </mat-card>
+</section>

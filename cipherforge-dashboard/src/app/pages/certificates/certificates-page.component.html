@@ -1,0 +1,93 @@
+<section class="page-shell">
+  <header class="headline">
+    <div>
+      <h1>Certificates Archive</h1>
+      <p class="sub-title">Download certificate evidence as PDF/JSON and verify certificate authenticity via QR link.</p>
+    </div>
+    <button mat-stroked-button (click)="load()">Refresh</button>
+  </header>
+
+  @if (loading) {
+    <div class="state-text">
+      <mat-spinner diameter="28"></mat-spinner>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <p class="state-text">{{ errorMessage }}</p>
+  }
+
+  <div class="summary-grid">
+    <article class="summary-card">
+      <span>Total</span>
+      <strong>{{ totalCertificates }}</strong>
+    </article>
+    <article class="summary-card">
+      <span>Engine Certificates</span>
+      <strong>{{ engineCount }}</strong>
+    </article>
+    <article class="summary-card">
+      <span>Local Evidence</span>
+      <strong>{{ localCount }}</strong>
+    </article>
+  </div>
+
+  <mat-card>
+    <table mat-table [dataSource]="certificates" class="cert-table">
+      <ng-container matColumnDef="jobId">
+        <th mat-header-cell *matHeaderCellDef>Job ID</th>
+        <td mat-cell *matCellDef="let row">{{ row.jobId }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="source">
+        <th mat-header-cell *matHeaderCellDef>Source</th>
+        <td mat-cell *matCellDef="let row">
+          <span [class]="getSourceClass(row)">{{ getSourceLabel(row) }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="method">
+        <th mat-header-cell *matHeaderCellDef>Method</th>
+        <td mat-cell *matCellDef="let row">{{ row.method }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="verificationStatus">
+        <th mat-header-cell *matHeaderCellDef>Verification</th>
+        <td mat-cell *matCellDef="let row">{{ row.verificationStatus }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="recoveredFiles">
+        <th mat-header-cell *matHeaderCellDef>Recovered</th>
+        <td mat-cell *matCellDef="let row">{{ row.recoveredFiles }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="timestamp">
+        <th mat-header-cell *matHeaderCellDef>Timestamp</th>
+        <td mat-cell *matCellDef="let row">{{ row.timestamp | date: 'medium' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let row">
+          <div class="action-row">
+            <button mat-stroked-button type="button" (click)="downloadPdf(row)" matTooltip="Download PDF">
+              <mat-icon>picture_as_pdf</mat-icon>
+              PDF
+            </button>
+            <button mat-stroked-button type="button" (click)="downloadJson(row)" matTooltip="Download JSON">
+              <mat-icon>data_object</mat-icon>
+              JSON
+            </button>
+            <button mat-stroked-button type="button" (click)="openVerify(row)" matTooltip="Open QR verification view">
+              <mat-icon>qr_code_2</mat-icon>
+              Verify
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </mat-card>
+</section>
